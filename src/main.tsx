@@ -6,6 +6,8 @@ import App from "./App.tsx";
 
 export const queryClient = new QueryClient();
 
+(window as any).global = window;
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

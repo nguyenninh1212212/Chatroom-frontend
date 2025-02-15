@@ -1,4 +1,7 @@
 import axios from "axios";
+import { LoginRequest, RegisterRequest } from "../type/user";
+import Cookies from "js-cookie";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 const api = axios.create({
   baseURL: "/api", // URL của server
@@ -31,4 +34,42 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+export const login = async ({ username, password }: LoginRequest) => {
+  const res = await api.post("/auth/login", { username, password });
+  return res.data;
+};
+
+export const register = async ({
+  username,
+  password,
+  fullname,
+  email,
+}: RegisterRequest) => {
+  const res = await api.post("/auth/register", {
+    username,
+    password,
+    email,
+    fullname,
+  });
+  return res.data;
+};
+
 export default api;
+
+interface CustomJwtPayload extends JwtPayload {
+  sub?: string;
+  sub2?: string;
+}
+
+export const decodeToken = (): CustomJwtPayload | null => {
+  const token = Cookies.get("token"); // Lấy token từ cookie
+
+  if (!token) return null;
+
+  try {
+    return jwtDecode<CustomJwtPayload>(token);
+  } catch (error) {
+    console.error("Token không hợp lệ:", error);
+    return null;
+  }
+};

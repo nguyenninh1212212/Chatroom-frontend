@@ -2,10 +2,16 @@ import React, { useState } from "react";
 import { icons } from "../constanst";
 import { SwitchButton } from "./Button/SwitchButton";
 import ListMemberInRoom from "./ListMember";
+import { ITheRoom } from "../type/room";
 
-const InfoRoom = () => {
+interface room {
+  data: ITheRoom;
+}
+
+const InfoRoom: React.FC<room> = ({ data }) => {
   const valueToSwitch = ["All", "Online", "Offline"];
   const [status, setStatus] = useState("All");
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <div className="w-2/6 bg-blue-500 h-full flex flex-col rounded-lg overflow-hidden p-3 ">
@@ -17,9 +23,12 @@ const InfoRoom = () => {
             alt=""
             className="h-24 w-24 border-2 rounded-full"
           />
-          <p className="flex items-center">
-            <img src={icons.dot} className="w-5 h-5" alt="" />
-            Chat room 01
+          <p className="flex-col flex  items-center">
+            <div className="flex items-center">
+              <p className="text-lg">{data?.data?.name}</p>
+              <img src={icons.dot} className="w-5 h-5" alt="" />
+            </div>
+            <p className="text-sm ">Created by {data?.data?.owner?.fullName}</p>
           </p>
         </div>
         <div className="overflow-hidden flex flex-col items-center align-middle p-4 gap-2">
@@ -53,7 +62,7 @@ const InfoRoom = () => {
                     setStatus={setStatus}
                   />
                   <div className="bg-blue-700 rounded-lg px-3 pb-3 mt-3 flex flex-col ">
-                    <ListMemberInRoom />
+                    <ListMemberInRoom data={data?.data.members} message={""} />
                   </div>
                 </>
               )}

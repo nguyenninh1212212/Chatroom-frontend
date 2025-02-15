@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../api/userService";
+import { login } from "../api/index";
 import Cookies from "js-cookie";
 import { LoginRequest } from "../type/user";
 
@@ -10,6 +10,8 @@ const Login = () => {
 
   useEffect(() => {
     const token = Cookies.get("token");
+    console.log(token);
+
     if (token) {
       navigate("/");
     }

@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { RegisterRequest } from "../type/user";
-import { register } from "../api/userService";
+import { register } from "../api/index";
 import Cookies from "js-cookie";
 
 const Register = () => {

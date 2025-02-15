@@ -5,7 +5,11 @@ module.exports = {
     "index.html"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors:{
+        primary_100:"rgb(0, 86, 224)"
+      }
+    },
   },
   plugins: [require("tailwind-scrollbar-hide")],
 }

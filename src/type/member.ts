@@ -1,11 +1,11 @@
 import { UserInfo } from "./user";
 
-export interface MembersInfo {
+export interface IMembersInfo {
   id: string;
-  user: UserInfo;
+  userInfo: UserInfo;
 }
 
 export interface ListMembers {
   message: string;
-  data: MembersInfo[];
+  data: IMembersInfo[];
 }

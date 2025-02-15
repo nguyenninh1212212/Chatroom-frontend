@@ -1,7 +1,15 @@
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { UserInfo } from "../type/user";
+import React from "react";
+import { formatDate } from "../util/formatDate";
 
-const PopupUser = ({ togglePopup }: { togglePopup: () => void }) => {
+interface payload {
+  data: UserInfo;
+  togglePopup: () => void;
+}
+
+const PopupUser: React.FC<payload> = ({ data, togglePopup }) => {
   const token = Cookies.get("token");
   const navication = useNavigate();
   const signOut = () => {
@@ -26,7 +34,16 @@ const PopupUser = ({ togglePopup }: { togglePopup: () => void }) => {
             X
           </p>
         </div>
-        <p>Chi tiết thông tin user...</p>
+        <ul>
+          <li>Fullname : {data.fullname}</li>
+          <li>Email:{data.email}</li>
+          <li>
+            {"Created at "}
+            {formatDate(data.created).DateFormat}
+            {" - "}
+            {formatDate(data.created).HourFormat12}
+          </li>
+        </ul>
         <button
           className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
           onClick={signOut}

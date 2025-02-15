@@ -12,8 +12,21 @@ export interface RegisterRequest {
 
 export interface UserInfo {
   id: string;
+  fullName: string;
+  email: string;
+  created: string;
+  update: string;
+}
+
+export interface UserInfo {
+  id: string;
   fullname: string;
   email: string;
   created: string;
   update: string;
+}
+
+export interface IUserFE {
+  name: string;
+  email: string;
 }
