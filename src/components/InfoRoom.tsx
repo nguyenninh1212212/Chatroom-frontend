@@ -3,6 +3,10 @@ import { icons } from "../constanst";
 import { SwitchButton } from "./Button/SwitchButton";
 import ListMemberInRoom from "./ListMember";
 import { ITheRoom } from "../type/room";
+import {
+  getTailwindBgColor,
+  getFirstLetterOfLastWord,
+} from "../util/BgColorAlpha";
 
 interface room {
   data: ITheRoom;
@@ -18,11 +22,16 @@ const InfoRoom: React.FC<room> = ({ data }) => {
       {/* Phần nội dung cuộn được */}
       <div className="flex-1 overflow-auto scrollbar-hide">
         <div className="w-full flex flex-col items-center gap-2 border-b pt-16 pb-6">
-          <img
-            src={icons.User}
-            alt=""
-            className="h-24 w-24 border-2 rounded-full"
-          />
+          <div
+            className={`${getTailwindBgColor(
+              data.data.name || ""
+            )} w-20 h-20 border rounded-full items-center justify-center flex`}
+          >
+            <p className="text-3xl">
+              {" "}
+              {getFirstLetterOfLastWord(data.data.name || "")}
+            </p>
+          </div>
           <p className="flex-col flex  items-center">
             <div className="flex items-center">
               <p className="text-lg">{data?.data?.name}</p>

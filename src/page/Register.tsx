@@ -21,7 +21,7 @@ const Register = () => {
       alert("Register failed!");
     },
     onSuccess: () => {
-      navagition("auth/login");
+      navagition("/");
       alert("Register successful!");
     },
   });

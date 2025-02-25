@@ -2,6 +2,13 @@ import { IMembersInfo } from "./member";
 import { IMessageInfo } from "./message";
 import { IUserFE, UserInfo } from "./user";
 
+export interface page {
+  data: IRoomInfo[];
+  page: number;
+  size: number;
+  totalPages: number;
+}
+
 export interface IRoomInfo {
   id: string;
   name: string;
@@ -17,7 +24,7 @@ export interface IRoomInfo {
 
 export interface IListRoom {
   message: string;
-  data: IRoomInfo[];
+  data: page;
 }
 
 export interface IRoomDetail {

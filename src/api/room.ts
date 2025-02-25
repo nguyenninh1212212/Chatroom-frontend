@@ -1,22 +1,29 @@
 import api from ".";
-import { IAcTheRoom, IListRoom, ITheRoom } from "../type/room";
+import { IListRoom, ITheRoom } from "../type/room";
 
-export const getRooms = async (user_id: string): Promise<IListRoom> => {
-  const res = await api.get<IListRoom>("/room", { params: { user_id } });
+export const getRooms = async (
+  user_id: string,
+  size: number,
+  page: number
+): Promise<IListRoom> => {
+  const res = await api.get<IListRoom>("/room", {
+    params: { user_id, page, size },
+  });
   return res.data;
 };
 export const getTheRoom = async (
   user_id: string,
-  room_id: string
+  room_id: string,
+  page: number
 ): Promise<ITheRoom> => {
   const res = await api.get<ITheRoom>("/room/detail", {
-    params: { user_id, room_id },
+    params: { room_id, user_id, page },
   });
   return res.data;
 };
 
 export const joinTheRoom = async (room_id: string, user_id: string) => {
-  const res = await api.post<IAcTheRoom>("/room/join", {
+  const res = await api.post<ITheRoom>("/room/join", {
     room_id,
     user_id,
   });
@@ -24,12 +31,16 @@ export const joinTheRoom = async (room_id: string, user_id: string) => {
 };
 
 export const leaveTheRoom = async (room_id: string) => {
-  const res = await api.post<IAcTheRoom>("/room/leave", {
+  const res = await api.post<ITheRoom>("/room/leave", {
     room_id,
   });
   return res.data;
 };
-export const searchRoom = async (keyword: string): Promise<IListRoom> => {
-  const res = await api.get<IListRoom>("/room/search", { params: { keyword } });
+
+export const createRoom = async (user_id: string, name: string) => {
+  const res = await api.post<ITheRoom>("/room/cre", {
+    user_id,
+    name,
+  });
   return res.data;
 };

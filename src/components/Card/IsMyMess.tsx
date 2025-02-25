@@ -8,9 +8,11 @@ import {
 
 interface IMessageCard {
   data: IMessageInfo;
+  myEmail: string;
 }
-const MessageCard: React.FC<IMessageCard> = ({ data }) => {
-  const { content, created, sender, mine } = data;
+const IsMyMess: React.FC<IMessageCard> = ({ data, myEmail }) => {
+  const { content, created, email, sender } = data;
+  const mine = myEmail === email || email == undefined;
 
   return (
     <div
@@ -21,7 +23,7 @@ const MessageCard: React.FC<IMessageCard> = ({ data }) => {
           <div
             className={`${getTailwindBgColor(
               sender || ""
-            )} rounded-full h-10 w-10 flex items-center justify-center mt-6 relative bottom-5`}
+            )} rounded-full h-8 w-8 flex items-center justify-center mt-6`}
           >
             <p className="text-xl">{getFirstLetterOfLastWord(sender || "")}</p>
           </div>
@@ -31,8 +33,8 @@ const MessageCard: React.FC<IMessageCard> = ({ data }) => {
           <p
             className={`p-2  shadow-md max-w-xs break-words text-white ${
               mine
-                ? `${getTailwindBgColor(sender)} rounded-b-2xl rounded-tl-2xl`
-                : "bg-stone-400 rounded-b-2xl rounded-tr-2xl"
+                ? `${getTailwindBgColor(sender)} rounded-tl-2xl rounded-b-2xl`
+                : "bg-stone-400 rounded-tr-2xl rounded-b-2xl"
             }`}
           >
             {content}
@@ -46,4 +48,4 @@ const MessageCard: React.FC<IMessageCard> = ({ data }) => {
   );
 };
 
-export default MessageCard;
+export default IsMyMess;

@@ -25,27 +25,29 @@ const PopupUser: React.FC<payload> = ({ data, togglePopup }) => {
       onClick={togglePopup} // Khi bấm ngoài popup sẽ đóng
     >
       <div
-        className="bg-white p-6 rounded-lg shadow-lg w-80"
+        className="bg-white p-6 rounded-lg shadow-lg w-[1200px] h-[700px]"
         onClick={(e) => e.stopPropagation()} // Chặn sự kiện click lan ra ngoài popup
       >
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="text-lg font-bold ">Thông tin người dùng</h2>
-          <p className="text-gray-400 cursor-pointer " onClick={togglePopup}>
-            X
-          </p>
+        <div className="flex flex-col  bg-red-500 justify-between">
+          <div className="flex justify-between items-center mb-5 ">
+            <h2 className="text-lg font-bold ">Thông tin người dùng</h2>
+            <p className="text-gray-400 cursor-pointer " onClick={togglePopup}>
+              X
+            </p>
+          </div>
+          <ul>
+            <li>Fullname : {data.fullname}</li>
+            <li>Email:{data.email}</li>
+            <li>
+              {"Created at "}
+              {data.created && formatDate(data.created)?.DateFormat}
+              {" - "}
+              {data.created && formatDate(data.created)?.HourFormat12}
+            </li>
+          </ul>
         </div>
-        <ul>
-          <li>Fullname : {data.fullname}</li>
-          <li>Email:{data.email}</li>
-          <li>
-            {"Created at "}
-            {formatDate(data.created).DateFormat}
-            {" - "}
-            {formatDate(data.created).HourFormat12}
-          </li>
-        </ul>
         <button
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+          className=" px-4 py-2  bg-red-500 text-white rounded-lg "
           onClick={signOut}
         >
           Sign out

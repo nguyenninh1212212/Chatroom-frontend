@@ -59,6 +59,8 @@ export default api;
 interface CustomJwtPayload extends JwtPayload {
   sub?: string;
   sub2?: string;
+  sub3?: string;
+  sub4?: string;
 }
 
 export const decodeToken = (): CustomJwtPayload | null => {
@@ -73,3 +75,4 @@ export const decodeToken = (): CustomJwtPayload | null => {
     return null;
   }
 };
+export const user_id: string = decodeToken()?.sub2 || "";

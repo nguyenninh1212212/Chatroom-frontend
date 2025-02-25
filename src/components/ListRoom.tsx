@@ -1,23 +1,46 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { icons } from "../constanst";
 import PopupUser from "./PopupUser";
 import { SwitchButton } from "./Button/SwitchButton";
 import { useQuery } from "@tanstack/react-query";
-import { getRooms, searchRoom } from "../api/room";
-import CardRoom from "./Card/CardRoom";
 import { getUser } from "../api/user";
 import { UserInfo } from "../type/user";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { decodeToken } from "../api";
+import {
+  getFirstLetterOfLastWord,
+  getTailwindBgColor,
+} from "../util/BgColorAlpha";
+import Chats from "./List/Chats";
+import Friends from "./List/Friends";
+import Invitation from "./List/Intvitation/Invitation";
+import { search } from "../api/search";
+import CardSearch from "./Card/CardSearch";
+import DiagramLayout from "../util/Diagram/DiagramLayout";
+import CreateRoomScreen from "../util/Diagram/CreateRoomScreen";
 
 const ListRooms = () => {
   const { id } = useParams();
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [showDiagram, setShowDiagram] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [keyword, setKeyword] = useState<string>("");
-  const [debouncedKeyword, setDebouncedKeyword] = useState<string>(""); // Từ khóa có debounce
-  const valueToSwitch = ["All", "Private", "Public"];
-  const [status, setStatus] = useState("All");
+  const [debouncedKeyword, setDebouncedKeyword] = useState<string>("");
+  const valueToSwitch = ["Chat", "Friends", "Invitation"];
+  const [status, setStatus] = useState("Chat");
+
+  const switchList = [
+    {
+      status: "Chat",
+      component: (
+        <Chats setShowDiagram={setShowDiagram} showDiagram={showDiagram} />
+      ),
+    },
+    {
+      status: "Friends",
+      component: <Friends user_id={decodeToken()?.sub2 || ""} />,
+    },
+    { status: "Invitation", component: <Invitation /> },
+  ];
 
   const togglePopup = () => setShowPopup(!showPopup);
 
@@ -28,46 +51,57 @@ const ListRooms = () => {
     return () => clearTimeout(handler);
   }, [keyword]);
 
-  // Fetch danh sách phòng
-  const { data, isLoading } = useQuery({
-    queryKey: ["rooms"],
-    queryFn: () => getRooms(decodeToken()?.sub2),
-  });
-  console.log("🚀 ~ ListRooms ~ decodeToken()?.sub2:", decodeToken()?.sub);
-
   // Fetch thông tin user
   const { data: info, isLoading: loadingInfo } = useQuery({
     queryKey: ["infoUser"],
-    queryFn: () => getUser(decodeToken()?.sub),
+    queryFn: () => getUser(decodeToken()?.sub || "", decodeToken()?.sub4 || ""),
   });
 
-  // Fetch tìm kiếm phòng (chỉ gọi API khi có `debouncedKeyword`)
   const { data: searchResults, isLoading: loadingSearch } = useQuery({
     queryKey: ["searchRoom", debouncedKeyword],
-    queryFn: () => searchRoom(debouncedKeyword),
-    enabled: !!debouncedKeyword, // Chỉ fetch khi có từ khóa
+    queryFn: () =>
+      debouncedKeyword ? search(debouncedKeyword) : Promise.resolve([]),
+    enabled: !!debouncedKeyword,
+    staleTime: 10000, // 10 giây trước khi fetch lại
   });
 
-  console.log("🚀 ~ ListRooms ~ searchResults:", searchResults);
-
-  // Ghi nhớ danh sách phòng
-  const memoizedRooms = useMemo(() => data?.data || [], [data]);
+  const resSearch = [
+    ...(searchResults?.user || ""),
+    ...(searchResults?.room || ""),
+  ];
 
   // Ghi nhớ thông tin người dùng
-  const memoizedUser: UserInfo = useMemo(() => info?.data || {}, [info]);
-
-  if (!data) return <p>No data</p>;
+  const memoizedUser: UserInfo = useMemo(
+    () => ({
+      id: "",
+      fullName: "",
+      email: "",
+      created: "",
+      updated: "",
+      update: info?.data.update || "",
+      ...info?.data,
+    }),
+    [info]
+  );
 
   return (
-    <div className="h-auto bg-gray-200 w-[30%] rounded-lg flex flex-col overflow-hidden ">
+    <div className="h-auto bg-white w-[30%] rounded-lg flex flex-col overflow-hidden line-clamp-6 border border-stone-400">
       {/* Header - Phần cố định */}
       <div
-        className="flex items-center bg-blue-500 p-4 cursor-pointer"
+        className="flex items-center bg-blue-500 p-4 cursor-pointer  "
         onClick={togglePopup}
       >
-        <img src={icons.User} alt="" className="h-14 w-14" />
+        <div
+          className={`${getTailwindBgColor(
+            info?.data.fullname || ""
+          )} rounded-full h-16 w-16 flex items-center justify-center border`}
+        >
+          <p className="text-3xl">
+            {getFirstLetterOfLastWord(info?.data.fullname || "")}
+          </p>
+        </div>
         <div className="ml-2">
-          <p className="font-bold text-xl text-white">
+          <p className="font-bold text-xl text-white ">
             {loadingInfo ? "Loading..." : memoizedUser.fullname || "Unknown"}
           </p>
           <p className="text-xs text-green-400 font-bold">Online</p>
@@ -88,7 +122,7 @@ const ListRooms = () => {
           <input
             type="text"
             placeholder="Search to join the chat!"
-            className="p-3 w-full rounded-3xl border border-gray-500 text-black"
+            className="p-3 w-full rounded-3xl border border-gray-500 bg-stone-200 text-black"
             onFocus={() => setIsFocused(true)}
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -98,7 +132,7 @@ const ListRooms = () => {
         {/* Chỉ hiển thị filter nếu không focus vào ô tìm kiếm */}
         {!isFocused && (
           <SwitchButton
-            firstButton={"All"}
+            firstButton={"Chat"}
             value={valueToSwitch}
             background={{ target: "bg-blue-600", untarget: "bg-blue-300" }}
             text={{ target: "text-white", untarget: "text-white" }}
@@ -107,28 +141,21 @@ const ListRooms = () => {
         )}
       </div>
 
-      {/* Danh sách phòng */}
       <div className="flex-1 min-h-0 overflow-auto p-4">
-        {isLoading ? (
-          <center>
-            <p>Loading...</p>
-          </center>
-        ) : isFocused ? (
-          <div className="sticky h-full w-full left-0 right-0 mt-2 bg-white border-gray-400 shadow-xl border rounded-lg p-2 text-black">
+        {isFocused ? (
+          <div className="sticky h-1/2 w-full left-0 right-0 mt-2 bg-white border-gray-400 shadow-xl border rounded-lg p-2 text-black overflow-y-auto">
             <p className="text-gray-500">Gợi ý tìm kiếm...</p>
             <ul>
               {loadingSearch ? (
                 <p>Đang tìm kiếm...</p>
-              ) : searchResults?.data?.length > 0 ? (
-                searchResults.data.map((e: any, _i: number) => (
+              ) : resSearch.length > 0 ? (
+                resSearch.map((e: any, _i: number) => (
                   <li key={e.id}>
-                    <Link
-                      to={`/room/${e.id}`}
-                      className="block p-2 hover:bg-stone-300 cursor-pointer"
-                      onClick={() => setIsFocused(false)}
-                    >
-                      <CardRoom key={_i} data={e} target={""} />
-                    </Link>
+                    <CardSearch
+                      fullname={e.fullname}
+                      name={e.name}
+                      friend={e.friend}
+                    />
                   </li>
                 ))
               ) : (
@@ -137,13 +164,27 @@ const ListRooms = () => {
             </ul>
           </div>
         ) : (
-          memoizedRooms.map((e, _i) => (
-            <CardRoom key={_i} data={e} target={id} />
-          ))
+          <>
+            {switchList.find((e) => e.status === status)?.component || (
+              <p className="text-red-500 text-center">No result</p>
+            )}
+          </>
         )}
       </div>
 
       {showPopup && <PopupUser togglePopup={togglePopup} data={memoizedUser} />}
+      {showDiagram && (
+        <DiagramLayout
+          component={
+            <CreateRoomScreen
+              setShowDiagram={setShowDiagram}
+              showDiagram={showDiagram}
+            />
+          }
+          setShowgram={setShowDiagram}
+          showgram={showDiagram}
+        />
+      )}
     </div>
   );
 };
